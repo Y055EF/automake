@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Login Page</title>
+    <style>
+        /* Maintain the same CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .tiktok-login-button {
+            display: inline-block;
+            background-color: #000000;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .token-display {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            word-break: break-all;
+        }
+        pre {
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>TikTok Access Token Generator</h1>
+    
+    <div id="loginSection" class="hidden">
+        <p>Click the button below to log in with TikTok and get your access token:</p>
+        <a id="loginButton" href="#" class="tiktok-login-button">Continue with TikTok</a>
+    </div>
+
+    <div id="tokenSection" class="hidden">
+        <div class="token-display">
+            <h2>Your Access Token:</h2>
+            <pre id="accessToken"></pre>
+            <h2 id="refreshTokenHeading" class="hidden">Your Refresh Token:</h2>
+            <pre id="refreshToken"></pre>
+            <h2>Full Response:</h2>
+            <pre id="fullResponse"></pre>
+        </div>
+        <p><strong>Important:</strong> Save these tokens securely! The access token will expire in 24 hours, but you can use the refresh token to get a new access token.</p>
+        <a id="startOver" href="#" class="tiktok-login-button">Start Over</a>
+    </div>
+
+    <div id="errorSection" class="hidden">
+        <p>Error retrieving access token. Please try again.</p>
+        <a id="retryButton" href="#" class="tiktok-login-button">Try Again</a>
+    </div>
+
+    <div>
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Replace <code>YOUR_CLIENT_KEY</code>, <code>YOUR_CLIENT_SECRET</code>, and <code>YOUR_REDIRECT_URI</code> in the JavaScript code with your actual TikTok developer credentials</li>
+            <li>Upload this file to your web server (must be accessible via HTTPS)</li>
+            <li>Make sure this file's URL matches exactly with the redirect URI you registered in your TikTok developer app</li>
+            <li>Click the "Continue with TikTok" button to authenticate and get your access token</li>
+        </ol>
+    </div>
+
+    <script>
+        // Configuration - Update these values
+        const client_key = "sbawoez1q1n6qknyar";
+        const client_secret = "5tBHU0JXIOJeDEGUL6pk0gnJQ08cukRU";
+        const redirect_uri = "https://y055ef.github.io/automake/authentication.html";
+
+        // State management
+        const urlParams = new URLSearchParams(window.location.search);
+        const authorizationCode = urlParams.get('code');
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Element references
+            const loginSection = document.getElementById('loginSection');
+            const tokenSection = document.getElementById('tokenSection');
+            const errorSection = document.getElementById('errorSection');
+            
+            // Initialize login URL
+            const loginButton = document.getElementById('loginButton');
+            loginButton.href = generateAuthUrl();
+
+            if (authorizationCode) {
+                try {
+                    const tokenData = await exchangeCodeForToken(authorizationCode);
+                    displayTokens(tokenData);
+                    loginSection.classList.add('hidden');
+                    tokenSection.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Error:', error);
+                    loginSection.classList.add('hidden');
+                    errorSection.classList.remove('hidden');
+                }
+            } else {
+                loginSection.classList.remove('hidden');
+            }
+
+            // Event listeners
+            document.getElementById('startOver').addEventListener('click', () => {
+                window.location.href = window.location.pathname;
+            });
+
+            document.getElementById('retryButton').addEventListener('click', () => {
+                window.location.href = generateAuthUrl();
+            });
+        });
+
+        async function exchangeCodeForToken(code) {
+            const tokenUrl = "https://open.tiktokapis.com/v2/oauth/token/";
+            const postData = new URLSearchParams({
+                client_key,
+                client_secret,
+                code,
+                grant_type: 'authorization_code',
+                redirect_uri
+            });
+
+            const response = await fetch(tokenUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: postData
+            });
+
+            if (!response.ok) throw new Error('Token exchange failed');
+            return await response.json();
+        }
+
+        function displayTokens(tokenData) {
+            document.getElementById('accessToken').textContent = tokenData.access_token;
+            
+            if (tokenData.refresh_token) {
+                document.getElementById('refreshToken').textContent = tokenData.refresh_token;
+                document.getElementById('refreshTokenHeading').classList.remove('hidden');
+            }
+            
+            document.getElementById('fullResponse').textContent = JSON.stringify(tokenData, null, 2);
+        }
+
+        function generateAuthUrl() {
+            const authUrl = "https://www.tiktok.com/v2/auth/authorize/";
+            const params = new URLSearchParams({
+                client_key,
+                response_type: 'code',
+                scope: 'user.info.basic,user.info.profile,user.info.stats,video.publish,video.upload',
+                redirect_uri,
+                state: generateRandomState()
+            });
+            return `${authUrl}?${params.toString()}`;
+        }
+
+        function generateRandomState() {
+            const array = new Uint8Array(16);
+            window.crypto.getRandomValues(array);
+            return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+    </script>
+</body>
+</html>
