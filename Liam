@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liam Latte Adventures</title>
+    <style>
+        body {
+            font-family: 'Trebuchet MS', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5e9d9, #d4a76a);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(139, 69, 19, 0.3);
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #6b4226;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .coffee-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .input-container {
+            margin: 30px 0;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #d4a76a;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: #6b4226;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.2);
+        }
+        
+        button {
+            background-color: #6b4226;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background-color: #8b4513;
+            transform: translateY(-3px);
+        }
+        
+        footer {
+            margin-top: 40px;
+            color: #6b4226;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="coffee-icon">☕</div>
+        <h1>Liam Latte Adventures</h1>
+        <p>Enter a theme for your coffee adventure story and join Liam Latte on an exciting journey!</p>
+        
+        <div class="input-container">
+            <input type="text" id="themeInput" placeholder="What's the theme of the story you want? (e.g., Space, Mystery, Fantasy)">
+        </div>
+        
+        <button id="generateBtn">Brew Story</button>
+        
+        <footer>
+            Every cup tells a story. Every story begins with Liam Latte.
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const theme = document.getElementById('themeInput').value;
+            if (theme) {
+                alert("Brewing a " + theme + " adventure for Liam Latte! (In a real application, this would generate your story.)");
+            } else {
+                alert("Please enter a theme for your adventure!");
+            }
+        });
+    </script>
+</body>
+</html>
